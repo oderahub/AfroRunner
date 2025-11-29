@@ -6,8 +6,26 @@ import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { WagmiProvider, createConfig, http, useConnect } from "wagmi";
-import { celo, celoAlfajores } from "wagmi/chains";
-import { ConnectButton } from "./connect-button";
+import { celo } from "wagmi/chains";
+import { defineChain } from "viem";
+
+// Define Celo Sepolia testnet
+export const celoSepolia = defineChain({
+  id: 11142220,
+  name: 'Celo Sepolia Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'CELO',
+    symbol: 'CELO',
+  },
+  rpcUrls: {
+    default: { http: ['https://forno.celo-sepolia.celo-testnet.org'] },
+  },
+  blockExplorers: {
+    default: { name: 'CeloScan', url: 'https://sepolia.celoscan.io' },
+  },
+  testnet: true,
+});
 
 const connectors = connectorsForWallets(
   [
@@ -17,17 +35,17 @@ const connectors = connectorsForWallets(
     },
   ],
   {
-    appName: "my-celo-app",
+    appName: "CeloRiders",
     projectId: process.env.NEXT_PUBLIC_WC_PROJECT_ID!,
   }
 );
 
 const wagmiConfig = createConfig({
-  chains: [celo, celoAlfajores],
+  chains: [celoSepolia, celo],
   connectors,
   transports: {
+    [celoSepolia.id]: http(),
     [celo.id]: http(),
-    [celoAlfajores.id]: http(),
   },
   ssr: true,
 });

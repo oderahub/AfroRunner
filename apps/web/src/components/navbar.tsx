@@ -12,6 +12,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { WalletConnectButton } from "@/components/connect-button"
+import { useMiniPay } from "@/hooks/useMiniPay"
 
 const navLinks = [
   { name: "Home", href: "/" },
@@ -20,7 +21,13 @@ const navLinks = [
 
 export function Navbar() {
   const pathname = usePathname()
-  
+  const { isMiniPay } = useMiniPay()
+
+  // Hide navbar in MiniPay for fullscreen game experience
+  if (isMiniPay) {
+    return null;
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 max-w-screen-2xl items-center justify-between px-4">
@@ -35,9 +42,8 @@ export function Navbar() {
             </SheetTrigger>
             <SheetContent side="left" className="w-80">
               <div className="flex items-center gap-2 mb-8">
-
                 <span className="font-bold text-lg">
-                  my-celo-app
+                  CeloRiders
                 </span>
               </div>
               <nav className="flex flex-col gap-4">
@@ -66,9 +72,8 @@ export function Navbar() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-
             <span className="hidden font-bold text-xl sm:inline-block">
-              my-celo-app
+              CeloRiders
             </span>
           </Link>
         </div>

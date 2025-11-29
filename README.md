@@ -1,29 +1,66 @@
-# my-celo-app
+# CeloRiders 🛹
 
-A new Celo blockchain project
+A blockchain-powered, play-to-earn skateboarding game built for the **Celo Africa DAO Mobile Game & Prediction Markets Hackathon**.
 
-A modern Celo blockchain application built with Next.js, TypeScript, and Turborepo.
+**🎮 Stake 1 CELO • Compete Daily • Win Prizes!**
 
-## Getting Started
+CeloRiders is a GBA-style skateboarding game with on-chain tournaments, leaderboards, and prize distribution. Optimized for **MiniPay** mobile wallet with 5M+ users across Africa.
 
-1. Install dependencies:
-   ```bash
-   pnpm install
-   ```
+## 🚀 Features
 
-2. Start the development server:
-   ```bash
-   pnpm dev
-   ```
+- **Daily Tournaments**: Stake 1 CELO to enter, compete for top 10 spots
+- **On-Chain Leaderboard**: Scores submitted directly to Celo blockchain
+- **Prize Distribution**: Top 10 players split 95% of prize pool
+  - 1st: 30% | 2nd: 20% | 3rd: 15% | 4th: 10% | 5th: 8% | 6th: 6% | 7-10: 1.5% each
+- **MiniPay Integration**: Auto-connect wallet, fullscreen mobile experience
+- **Daily Reset**: Tournament resets at midnight WAT (UTC+1)
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
+## 📱 MiniPay Ready
 
-## Project Structure
+This dApp is fully optimized for MiniPay:
+- ✅ Auto-connect wallet
+- ✅ Fullscreen gaming experience
+- ✅ Mobile-first responsive design
+- ✅ Works with 2MB MiniPay wallet
+- ✅ Sub-cent transaction fees
 
-This is a monorepo managed by Turborepo with the following structure:
+**[See MiniPay Integration Guide →](./MINIPAY.md)**
 
-- `apps/web` - Next.js application with embedded UI components and utilities
-- `apps/hardhat` - Smart contract development environment
+## 🎯 Quick Start
+
+### 1. Install dependencies:
+```bash
+pnpm install
+```
+
+### 2. Set up environment variables:
+```bash
+# Copy .env.local and update with your values
+cp apps/web/.env.local.example apps/web/.env.local
+```
+
+### 3. Start the development server:
+```bash
+pnpm dev
+```
+
+### 4. Test with MiniPay:
+```bash
+# In another terminal
+ngrok http 3000
+# Load the ngrok URL in MiniPay Developer Settings
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 📁 Project Structure
+
+This is a monorepo managed by Turborepo:
+
+- `apps/web` - Next.js 14 app with Phaser.js game engine
+- `apps/contracts` - Hardhat smart contract environment
+  - `contracts/DailyTournament.sol` - Tournament smart contract
+  - Deployed at: `0xAE5d214ecE811D3B65E42f7018e8fD77f16ebb78` (Celo Sepolia)
 
 ## Available Scripts
 
@@ -41,15 +78,16 @@ This is a monorepo managed by Turborepo with the following structure:
 - `pnpm contracts:deploy:sepolia` - Deploy to Celo Sepolia testnet
 - `pnpm contracts:deploy:celo` - Deploy to Celo mainnet
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- **Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: shadcn/ui
-- **Smart Contracts**: Hardhat with Viem
-- **Monorepo**: Turborepo
-- **Package Manager**: PNPM
+- **Frontend**: Next.js 14 (App Router) + TypeScript
+- **Game Engine**: Phaser.js 3.90
+- **Web3**: Wagmi 2.0 + Viem 2.0 + RainbowKit
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Smart Contracts**: Solidity 0.8.28 + Hardhat
+- **Blockchain**: Celo (Sepolia Testnet)
+- **Wallet**: MiniPay + MetaMask support
+- **Monorepo**: Turborepo + PNPM
 
 ## Learn More
 

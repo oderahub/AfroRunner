@@ -19,3 +19,6 @@ export function ConnectButton() {
 
   return <RainbowKitConnectButton />;
 }
+
+// Export as WalletConnectButton for backwards compatibility
+export { ConnectButton as WalletConnectButton };
