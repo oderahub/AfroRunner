@@ -23,7 +23,7 @@ const config: HardhatUserConfig = {
       chainId: 42220,
     },
     // Celo Sepolia Testnet
-    sepolia: {
+    "celo-sepolia": {
       url: "https://forno.celo-sepolia.celo-testnet.org",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11142220,
@@ -33,27 +33,6 @@ const config: HardhatUserConfig = {
       url: "http://127.0.0.1:8545",
       chainId: 31337,
     },
-  },
-  etherscan: {
-    apiKey: process.env.CELOSCAN_API_KEY || "",
-    customChains: [
-      {
-        network: "celo",
-        chainId: 42220,
-        urls: {
-          apiURL: "https://api.celoscan.io/api",
-          browserURL: "https://celoscan.io",
-        },
-      },
-      {
-        network: "sepolia",
-        chainId: 11142220,
-        urls: {
-          apiURL: "https://api.celoscan.io/api",
-          browserURL: "https://celoscan.io",
-        },
-      },
-    ],
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS !== undefined,

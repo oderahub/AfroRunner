@@ -29,6 +29,50 @@ export default class CharacterSelect extends Phaser.Scene {
       fontFamily: '"Press Start 2P", monospace'
     }).setOrigin(0.5);
 
+    // Set up stakeConfirmed listener early to avoid race condition
+    const handleStakeConfirmed = () => {
+      console.log('Stake confirmed! Starting game...');
+
+      // Check if a character was selected
+      if (!(window as any).selectedCharacter) {
+        console.log('No character selected yet, waiting...');
+        return;
+      }
+
+      // Clean up the listener
+      window.removeEventListener('stakeConfirmed', handleStakeConfirmed);
+
+      // Stop ALL sounds including menu music when game starts
+      this.sound.stopAll();
+      this.game.sound.stopAll();
+
+      // Stop global menu music instance on window
+      if ((window as any).menuMusicInstance) {
+        try {
+          (window as any).menuMusicInstance.stop();
+          (window as any).menuMusicInstance.destroy();
+        } catch (e) {
+          // Music might already be destroyed
+        }
+        (window as any).menuMusicInstance = undefined;
+        // CRITICAL: Reset the flag so menu music can restart when returning to menu
+        (window as any).menuMusicStarted = false;
+      }
+
+      // Pass selected character to Game scene
+      console.log('Transitioning to Game scene with character:', (window as any).selectedCharacter);
+      this.scene.start('Game', { selectedCharacter: (window as any).selectedCharacter });
+    };
+
+    // Add listener at scene creation to prevent race condition
+    console.log('CharacterSelect: Setting up stakeConfirmed listener');
+    window.addEventListener('stakeConfirmed', handleStakeConfirmed);
+
+    // Clean up listener when scene shuts down
+    this.events.on('shutdown', () => {
+      window.removeEventListener('stakeConfirmed', handleStakeConfirmed);
+    });
+
     // Character 1: Zombie Kev with red outline
     const zombieContainer = this.add.container(cam.centerX - 140, cam.centerY);
     const zombieBorder = this.add.graphics();
@@ -169,36 +213,7 @@ export default class CharacterSelect extends Phaser.Scene {
     console.log('Character selected:', selectedCharacter, '- Dispatching gameStartRequested');
 
     // Dispatch event to React layer to check staking
+    // The stakeConfirmed listener is already set up in create() to avoid race condition
     window.dispatchEvent(new CustomEvent('gameStartRequested'));
-
-    // Listen for stake confirmation
-    const handleStakeConfirmed = () => {
-      console.log('Stake confirmed! Starting game...');
-      window.removeEventListener('stakeConfirmed', handleStakeConfirmed);
-
-      // Stop ALL sounds including menu music when game starts
-      this.sound.stopAll();
-      this.game.sound.stopAll();
-
-      // Stop global menu music instance on window
-      if ((window as any).menuMusicInstance) {
-        try {
-          (window as any).menuMusicInstance.stop();
-          (window as any).menuMusicInstance.destroy();
-        } catch (e) {
-          // Music might already be destroyed
-        }
-        (window as any).menuMusicInstance = undefined;
-        // CRITICAL: Reset the flag so menu music can restart when returning to menu
-        (window as any).menuMusicStarted = false;
-      }
-
-      // Pass selected character to Game scene
-      console.log('Transitioning to Game scene with character:', (window as any).selectedCharacter);
-      this.scene.start('Game', { selectedCharacter: (window as any).selectedCharacter });
-    };
-
-    console.log('Listening for stakeConfirmed event');
-    window.addEventListener('stakeConfirmed', handleStakeConfirmed);
   }
 }
