@@ -725,27 +725,6 @@ export default function CeloRidersGame({ contractAddress }: CeloRidersGameProps)
         </div>
       )}
 
-      {/* Debug Panel - Shows Contract State */}
-      {isConnected && process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-4 right-4 bg-black bg-opacity-80 text-white px-4 py-3 rounded-lg text-xs max-w-xs"
-             style={{ fontFamily: 'monospace', zIndex: 50 }}>
-          <div className="text-yellow-400 font-bold mb-2">🔍 DEBUG PANEL</div>
-          <div className="space-y-1 text-[10px]">
-            <p>Network: {chain?.name || 'Unknown'}</p>
-            <p>Chain ID: {chain?.id || 'N/A'}</p>
-            <p>Contract: {contractAddress.slice(0, 6)}...{contractAddress.slice(-4)}</p>
-            <p>Wallet: {address?.slice(0, 6)}...{address?.slice(-4)}</p>
-            <p className={hasStaked ? 'text-green-400' : 'text-red-400'}>
-              Staked: {hasStaked ? '✓ YES' : '✗ NO'}
-            </p>
-            <p>Score: {currentScore || 0}</p>
-          </div>
-          <div className="mt-2 pt-2 border-t border-gray-600 text-[9px] text-gray-400">
-            Check browser console for detailed logs
-          </div>
-        </div>
-      )}
-
       {/* Wallet Info */}
       {isConnected && (
         <div className="absolute bottom-4 right-4 bg-white bg-opacity-10 text-white px-4 py-2 rounded-lg text-sm">
