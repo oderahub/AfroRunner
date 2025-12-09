@@ -61,6 +61,7 @@ function WalletProviderInner({ children }: { children: React.ReactNode }) {
   const { isConnected } = useAccount();
   const [attempted, setAttempted] = useState(false);
 
+  // Monitor connection status and log results
   useEffect(() => {
     if (isConnected || attempted) return;
 
@@ -90,6 +91,7 @@ function WalletProviderInner({ children }: { children: React.ReactNode }) {
         } finally {
           setAttempted(true);
         }
+        return true;
       }
     };
 
