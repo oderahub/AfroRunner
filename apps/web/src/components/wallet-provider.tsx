@@ -5,7 +5,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { injectedWallet } from "@rainbow-me/rainbowkit/wallets";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { WagmiProvider, createConfig, http, useConnect } from "wagmi";
+import { WagmiProvider, createConfig, http, useConnect, useAccount } from "wagmi";
 import { celo } from "wagmi/chains";
 import { defineChain } from "viem";
 
@@ -48,86 +48,61 @@ const wagmiConfig = createConfig({
     [celo.id]: http(),
   },
   ssr: true,
+  // CRUCIAL FOR MINIPAY (Dec 2025)
+  pollingInterval: 4_000,
+  // Prevents wagmi from thinking no wallet is present
+  syncConnectedChain: true,
 });
 
 const queryClient = new QueryClient();
 
 function WalletProviderInner({ children }: { children: React.ReactNode }) {
-  const { connect, connectors, status, error } = useConnect();
-  const [connectionAttempted, setConnectionAttempted] = useState(false);
+  const { connect, connectors } = useConnect();
+  const { isConnected } = useAccount();
+  const [attempted, setAttempted] = useState(false);
 
   // Monitor connection status and log results
   useEffect(() => {
-    if (status === 'success' && connectionAttempted) {
-      console.log('[MiniPay Auto-Connect] ✅ Connection successful!');
-    } else if (status === 'error' && error) {
-      console.error('[MiniPay Auto-Connect] ❌ Connection failed:', error);
-      // Reset to allow retry
-      setConnectionAttempted(false);
-    }
-  }, [status, error, connectionAttempted]);
+    if (isConnected || attempted) return;
 
-  useEffect(() => {
-    // Skip if already connected or attempting
-    if (status === 'success' || status === 'pending' || connectionAttempted) {
-      return;
-    }
+    const tryConnectMiniPay = async () => {
+      if (typeof window === "undefined" || !window.ethereum) return;
 
-    const attemptConnect = () => {
-      console.log('[MiniPay Auto-Connect] Checking for MiniPay...');
-      console.log('[MiniPay Auto-Connect] window.ethereum exists:', !!window.ethereum);
-      console.log('[MiniPay Auto-Connect] isMiniPay:', window.ethereum?.isMiniPay);
-      console.log('[MiniPay Auto-Connect] Available connectors:', connectors.map(c => c.id));
+      // THIS IS THE KEY: MiniPay requires manual activation (Dec 2025)
+      if ((window.ethereum as any)?.isMiniPay) {
+        try {
+          console.log("✅ MiniPay detected — forcing eth_requestAccounts");
 
-      if (window.ethereum && window.ethereum.isMiniPay) {
-        console.log('[MiniPay Auto-Connect] ✅ MiniPay detected! Auto-connecting...');
+          // This wakes up MiniPay and makes it behave like a real provider
+          await window.ethereum.request({ method: "eth_requestAccounts" });
 
-        const injectedConnector = connectors.find((c) => c.id === "injected");
-        if (injectedConnector) {
-          console.log('[MiniPay Auto-Connect] Found injected connector, connecting...');
-          setConnectionAttempted(true);
-          connect({ connector: injectedConnector });
-        } else {
-          console.error('[MiniPay Auto-Connect] ❌ No injected connector found!');
+          // Now find and connect the injected connector
+          const injected = connectors.find(
+            (c) => c.id === "injected" || c.type === "injected"
+          );
+
+          if (injected) {
+            await connect({ connector: injected });
+            console.log("✅ Successfully connected to MiniPay!");
+          }
+        } catch (err: any) {
+          // User rejected or something went wrong
+          console.warn("⚠️ MiniPay connection failed or rejected:", err.message);
+        } finally {
+          setAttempted(true);
         }
         return true;
       }
-      return false;
     };
 
-    // Attempt 1: Try immediately
-    if (attemptConnect()) {
-      return;
-    }
+    // Try immediately
+    tryConnectMiniPay();
 
-    // Attempt 2: Listen for ethereum#initialized event (standard for injected wallets)
-    const handleEthereumInitialized = () => {
-      console.log('[MiniPay Auto-Connect] ethereum#initialized event fired');
-      attemptConnect();
-    };
-    window.addEventListener('ethereum#initialized', handleEthereumInitialized);
+    // Also try again after a delay (in case provider loads late)
+    const timer = setTimeout(tryConnectMiniPay, 800);
 
-    // Attempt 3: Delayed retry for MiniPay (300ms is recommended in Celo docs)
-    const retryTimeout = setTimeout(() => {
-      console.log('[MiniPay Auto-Connect] Delayed retry...');
-      attemptConnect();
-    }, 300);
-
-    // Attempt 4: Final retry after 1 second
-    const finalRetryTimeout = setTimeout(() => {
-      console.log('[MiniPay Auto-Connect] Final retry...');
-      if (!connectionAttempted) {
-        attemptConnect();
-      }
-    }, 1000);
-
-    // Cleanup
-    return () => {
-      window.removeEventListener('ethereum#initialized', handleEthereumInitialized);
-      clearTimeout(retryTimeout);
-      clearTimeout(finalRetryTimeout);
-    };
-  }, [connect, connectors, status, connectionAttempted]);
+    return () => clearTimeout(timer);
+  }, [connect, connectors, isConnected, attempted]);
 
   return <>{children}</>;
 }
