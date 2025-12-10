@@ -1,40 +1,25 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: "standalone",   // This fixes the 200MB Cloudflare error
+  output: "standalone",   // Kills the 200MB cache → Cloudflare loves this
 
   reactStrictMode: true,
 
-  allowedDevOrigins: [
-    '*.ngrok.io',
-    '*.ngrok-free.app',
-    '*.ngrok-free.dev',
-  ],
-
-  compress: true,
-  productionBrowserSourceMaps: false,
-
+  // Only add CORS headers in development (ngrok)
   ...(process.env.NODE_ENV === 'development' && {
-    optimizeFonts: false,
+    async headers() {
+      return [
+        {
+          source: '/:path*',
+          headers: [
+            { key: 'Access-Control-Allow-Origin', value: '*' },
+            { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+            { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With, Content-Type, Authorization' },
+            { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
+          ],
+        },
+      ];
+    },
   }),
-
-  // FIXED: Always return an array — works in dev AND production
-  async headers() {
-    const devHeaders = process.env.NODE_ENV === 'development'
-      ? [
-        { key: 'Access-Control-Allow-Origin', value: '*' },
-        { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
-        { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With, Content-Type, Authorization' },
-        { key: 'Cache-Control', value: 'no-cache, no-store, must-revalidate' },
-      ]
-      : [];
-
-    return [
-      {
-        source: '/:path*',
-        headers: devHeaders,
-      },
-    ];
-  },
 
   webpack: (config, { dev, isServer }) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
