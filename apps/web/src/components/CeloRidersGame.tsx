@@ -173,11 +173,13 @@ export default function CeloRidersGame({ contractAddress }: CeloRidersGameProps)
       setNotification({
         show: true,
         title: 'Staked!',
-        message: '1 cUSD paid. Select character to start!',
+        message: 'Starting game...',
         type: 'success'
       })
-      // Don't automatically dispatch stakeConfirmed - let the user click the character
-      // This prevents race conditions and ensures the scene is ready
+      // Dispatch stakeConfirmed after a short delay to ensure CharacterSelect scene is ready
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('stakeConfirmed'))
+      }, 500)
     }
   }, [hasEntryPaid, address])
   useEffect(() => {
