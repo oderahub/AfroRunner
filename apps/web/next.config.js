@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',   // This is the magic — replaces `next export` entirely
+
   reactStrictMode: true,
 
-  // ONLY for development (ngrok)
+  // Dev-only CORS for ngrok
   ...(process.env.NODE_ENV === 'development' && {
     async headers() {
       return [
@@ -10,8 +12,8 @@ const nextConfig = {
           source: '/:path*',
           headers: [
             { key: 'Access-Control-Allow-Origin', value: '*' },
-            { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
-            { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With,Content-Type,Authorization' },
+            { key: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, DELETE, OPTIONS' },
+            { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With, Content-Type, Authorization' },
           ],
         },
       ];
@@ -25,9 +27,19 @@ const nextConfig = {
       '@react-native-async-storage/async-storage': false,
     };
     if (dev && !isServer) {
-      config.optimization = { ...config.optimization, splitChunks: false, minimize: false };
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: false,
+        minimize: false,
+      };
     }
     return config;
+  },
+
+  // Required for static export
+  trailingSlash: true,
+  images: {
+    unoptimized: true,
   },
 };
 
