@@ -115,13 +115,8 @@ export default function CeloRidersGame({ contractAddress }: CeloRidersGameProps)
     }
   }, [isMiniPay])
 
-  // Load staking status
-  useEffect(() => {
-    if (address) {
-      const key = `hasStaked_${address}_${contractAddress}`
-      if (localStorage.getItem(key) === 'true') setHasStaked(true)
-    }
-  }, [address, contractAddress])
+  // Don't load staking status from localStorage - users must stake for each new game
+  // hasStaked resets to false on page load or after game ends
 
   // Transaction monitoring
   const { isLoading: isApproving, isSuccess: hasApproved } = useWaitForTransactionReceipt({
@@ -175,7 +170,6 @@ export default function CeloRidersGame({ contractAddress }: CeloRidersGameProps)
   useEffect(() => {
     if (hasEntryPaid && address) {
       setHasStaked(true)
-      localStorage.setItem(`hasStaked_${address}_${contractAddress}`, 'true')
       setNotification({
         show: true,
         title: 'Staked!',
@@ -185,7 +179,7 @@ export default function CeloRidersGame({ contractAddress }: CeloRidersGameProps)
       // Don't automatically dispatch stakeConfirmed - let the user click the character
       // This prevents race conditions and ensures the scene is ready
     }
-  }, [hasEntryPaid, address, contractAddress])
+  }, [hasEntryPaid, address])
   useEffect(() => {
     if (hasScoreSubmitted) {
       setIsSubmittingScore(false)
@@ -256,7 +250,9 @@ export default function CeloRidersGame({ contractAddress }: CeloRidersGameProps)
 
     const handleGameOver = (e: any) => {
       setCurrentScore(e.detail.score)
-      if (isConnectedRef.current && hasStakedRef.current) setShowScoreModal(true)
+      // Reset stake requirement for next game
+      setHasStaked(false)
+      if (isConnectedRef.current) setShowScoreModal(true)
     }
 
     window.addEventListener('gameStartRequested', handleGameStartRequested)
