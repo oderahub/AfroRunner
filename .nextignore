@@ -1,0 +1,2 @@
+# Ignore huge webpack cache files – they are not needed in production
+cache/webpack/
