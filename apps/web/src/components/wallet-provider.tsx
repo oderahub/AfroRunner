@@ -41,7 +41,7 @@ const connectors = connectorsForWallets(
 );
 
 const wagmiConfig = createConfig({
-  chains: [celoSepolia, celo],
+  chains: [celo, celoSepolia], // Mainnet first
   connectors,
   transports: {
     [celoSepolia.id]: http(),

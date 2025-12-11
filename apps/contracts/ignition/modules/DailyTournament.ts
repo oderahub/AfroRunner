@@ -4,9 +4,9 @@
 import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
 
 const DailyTournamentModule = buildModule("DailyTournamentModule", (m) => {
-  // cUSD token address on Celo Sepolia testnet (ACTIVE with 697+ transactions)
-  // Source: https://sepolia.celoscan.io/address/0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b
-  const cUSDAddress = "0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b";
+  // cUSD token address on Celo Mainnet
+  // Source: https://explorer.celo.org/mainnet/token/0x765DE816845861e75A25fCA122bb6898B8B1282a
+  const cUSDAddress = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 
   // Deploy the DailyTournament contract with cUSD address
   const dailyTournament = m.contract("DailyTournament", [cUSDAddress]);

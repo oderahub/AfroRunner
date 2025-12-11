@@ -12,5 +12,5 @@ export const CONTRACTS = {
 // Helper to get contract address for current chain
 export function getTournamentContract(chainId: number): `0x${string}` {
   return CONTRACTS.DailyTournament[chainId as keyof typeof CONTRACTS.DailyTournament] ||
-         CONTRACTS.DailyTournament[11142220]; // Default to Celo Sepolia
+         CONTRACTS.DailyTournament[42220]; // Default to Celo Mainnet
 }

@@ -25,9 +25,9 @@ import OptionsMenu from '../game/scenes/OptionsMenu'
 import HowToPlay from '../game/scenes/HowToPlay'
 import Leaderboard from '../game/scenes/Leaderboard'
 
-// cUSD & Contract
-const CUSD_ADDRESS = '0xdE9e4C3ce781b4bA68120d6261cbad65ce0aB00b' as const
-const CORRECT_CONTRACT_ADDRESS = '0xcC36a406684c313f29848c2A0AfBdFc9A3B5503B' as const
+// cUSD & Contract (Celo Mainnet)
+const CUSD_ADDRESS = '0x765DE816845861e75A25fCA122bb6898B8B1282a' as const
+const CORRECT_CONTRACT_ADDRESS = '0x287974951879D77AdEcd8B115D2d16ef396B464c' as const
 
 // ABIs
 const ERC20_ABI = [
